@@ -369,3 +369,286 @@ steps:
 * The third step runs the mvn clean install command, which uses Maven to build the Java project. The clean goal removes any previous build artifacts, and the install goal compiles the code, runs tests, and packages the application.
 
 * The last step uses the mr-smithers-excellent/docker-build-push action to build the Docker image and push it to Docker Hub. It specifies the Docker image name (sharan7898/github-action) and the latest tag. The image is pushed to Docker Hub (docker.io) using the provided Dockerfile. The Docker Hub username and password are read from GitHub Secrets, allowing secure authentication during the push process.
+
+### Image in the Docker
+
+* Pull the workflow in STS using 
+
+```
+
+git pull origin master
+
+```
+
+The **.github/workflows/maven.yaml** folder will be created.
+
+* Open the maven.yml and edit the file for your Docker hub credentials.
+
+* Login to Dockerhub if u dont have an account you can create using this link https://www.docker.com/
+
+* Create a repository in the Docker Hub.
+
+* Change the image name and repository name in the in the maven.yml file(workflow file).
+
+* Create a new file in the Project, here i have given the name Dockerfile for the file.
+
+* Paste the above code inside the Dockerfile 
+
+```
+
+FROM openjdk:8
+EXPOSE 8080
+ADD target/github-action.jar github-action.jar
+ENTRYPOINT ["java","-jar","/github-action.jar"]
+
+```
+
+![docker](/images/docker.png)
+
+The Dockerfile describes the steps to build a Docker image for a Java application using OpenJDK 8.
+
+**FROM openjdk:8**: This line sets the base image for the Docker image. In this case, the image is based on OpenJDK 8, which means the Java application will be run using Java 8.
+
+**EXPOSE 8080**: This line exposes port 8080 in the Docker image. It allows the containerized Java application to accept incoming connections on port 8080.
+
+**ADD target/github-action.jar github-action.jar**: This line copies the github-action.jar file from the target directory of your project (assuming it's a Maven project) to the root of the Docker image. The ADD command is used to copy files from the host machine (in this case, your project directory) to the Docker image.
+
+**ENTRYPOINT** ["java","-jar","/github-action.jar"]: This line sets the entry point for the Docker container. It specifies the command that will be executed when the container starts. In this case, it tells Docker to run the Java application using the java -jar command, with the github-action.jar file as the argument.
+
+**Note**: Specify the jar name in pom.xml (jar name must be same to image name because we are expecting as an image name)
+
+![docker](/images/docker2.png)
+
+### Adding Secrets
+
+* Go to Github, click on the settings and click on secrets and variables and go to Actions
+
+![secrets](/images/secrets1.png)
+
+* Click on the New repository secret
+
+![secrets](/images/secrets2.png)
+
+* Add Name , Secret of our Docker credentials and then click Add secret.
+
+![secrets](/images/secrets3.png)
+
+* Again create an another New repository to add an Docker password.
+
+### Running Image in Docker
+
+* Once u have added the secret goto STS and commit and push the recent changes (add Docker file and update the pom.xml file)
+
+* Once u have pushed the code goto Actions and you can see the Actions running.
+
+* The Action name with the commit message build is executed all the steps in the docker file.
+
+![build](/images/build.png)
+
+* Now goto DockerHub repository and refresh it and you can see that the Image has been created.
+
+![build](/images/build1.png)
+
+### Running Image Locally
+
+* Run the Docker in your local Machine.
+
+* Go to DockerHub and click on the Public view and copy the Docker Pull Command
+
+![local](/images/local.png)
+
+![local](/images/local1.png)
+
+* Go to Command Prompt and paste the Docker Pull Command
+
+![local](/images/local2.png)
+
+* Go to Docker desktop and run the container, Once the Application is completed running  go to localhost:8080/welcome.
+
+![local](/images/local3.png)
+
+**Note**: Refer the following video for more information https://www.youtube.com/watch?v=NppkHKvnrqc&t=3s
+
+## GitHub Action Environments
+
+* GitHub Actions environments are a feature that allows you to define custom execution environments for your workflows. 
+
+* These environments provide a way to specify a set of environment variables, secrets, and other configurations that can be associated with specific branches, tags, or manually triggered workflows.
+
+* When a GitHub Actions workflow deploys to an environment, the environment is displayed on the main page of the repository. For more information about viewing deployments to environments, see ["Viewing deployment history."](https://docs.github.com/en/actions/deployment/managing-your-deployments/viewing-deployment-history)
+
+* When a workflow job references an environment, the job won't start until all of the environment's protection rules pass. 
+
+* A job also cannot access secrets that are defined in an environment until all the environment protection rules pass.
+
+### Create a Github Action Environments
+
+* Go your repository and  click  Settings.
+
+* In the left sidebar, click Environments.
+
+* Click New environment.
+
+![envi](/images/envi.png)
+
+* Enter a name for the environment, then click Configure environment.
+
+![envi](/images/envi2.png)
+
+* Optionally, specify people or teams that must approve workflow jobs that use this environment. For more information, see ["Required reviewers."](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#required-reviewers)
+
+1.Select Required reviewers.
+
+2.Enter up to 6 people or teams. 
+
+3.Only one of the required reviewers needs to approve the job for it to proceed.
+
+4.Click Save protection rules.
+
+* Optionally, specify the amount of time to wait before allowing workflow jobs that use this environment to proceed. For more information, see ["Wait timer."](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#wait-timer)
+
+1.Select Wait timer.
+
+2.Enter the number of minutes to wait. 
+
+3.Click Save protection rules.
+
+* Optionally, disallow bypassing configured protection rules. For more information, see ["Allow administrators to bypass configured protection rules."](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#allow-administrators-to-bypass-configured-protection-rules)
+
+1.Deselect Allow administrators to bypass configured protection rules.
+
+2.Click Save protection rules.
+
+* Optionally, specify what branches can deploy to this environment. For more information, see ["Deployment branches."](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#deployment-branches)
+
+1.Select the desired option in the Deployment branches dropdown.
+
+2.If you chose Selected branches, enter the branch name patterns that you want to allow.
+
+* Optionally, add environment secrets. These secrets are only available to workflow jobs that use the environment. Additionally, workflow jobs that use this environment can only access these secrets after any configured rules (for example, required reviewers) pass. For more information, see ["Environment secrets."](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#environment-secrets)
+
+1.Under Environment secrets, click Add Secret.
+
+2.Enter the secret name.
+
+3.Enter the secret value.
+
+4.Click Add secret.
+
+* Optionally, add environment variables. These variables are only available to workflow jobs that use the environment, and are only accessible using the vars context. For more information, see ["Environment variables."](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#environment-variables)
+
+1.Under Environment variables, click Add Variable.
+
+2.Enter the variable name.
+
+3.Enter the variable value.
+
+4.Click Add variable.
+
+### Using an Environment
+
+Each job in a workflow can reference a single environment. Any protection rules configured for the environment must pass before a job referencing the environment is sent to a runner. The job can access the environment's secrets only after the job is sent to a runner.
+
+When a workflow references an environment, the environment will appear in the repository's deployments. For more information about viewing current and previous deployments, see "Viewing deployment history."
+
+You can specify an environment for each job in your workflow. To do so, add a jobs.<job_id>.environment key followed by the name of the environment.
+
+For example, this workflow will use an environment called production.
+
+```
+
+name: Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: deploy
+        # ...deployment-specific steps
+
+```
+
+When the above workflow runs, the deployment job will be subject to any rules configured for the production environment. For example, if the environment requires reviewers, the job will pause until one of the reviewers approves the job.
+
+```
+
+name: Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    environment: 
+      name: production
+      url: https://github.com
+    steps:
+      - name: deploy
+        # ...deployment-specific steps
+
+```
+
+### Deployment Protection Rules
+
+Deployment protection rules, also known as deployment approval rules, are a feature in GitHub Actions that allows you to control the deployment process of your applications. These rules add an extra layer of control to your deployment workflows, ensuring that certain conditions are met before a deployment is allowed to proceed.
+
+With deployment protection rules, you can set up specific conditions that must be met before an automated deployment can proceed. These conditions may include requiring manual approvals, checks, or specific conditions related to the state of the code, environment, or other factors.
+
+For example, you might want to enforce the following conditions before deploying a new version of your application:
+
+* **Manual Approval**: Require manual approval from specific users or teams before the deployment proceeds. This ensures that someone reviews the changes and confirms that it's safe to deploy.
+
+* **Status Checks**: Ensure that certain status checks, such as passing tests or code analysis, are successful before deploying. This ensures that the code is in a stable state.
+
+* **Environment Checks**: Verify that the target deployment environment meets specific conditions or requirements before proceeding with the deployment.
+
+* **Branch Protection Rules**: Enforce branch protection rules, ensuring that only specific branches or tags can be deployed.
+
+To set up deployment protection rules in GitHub Actions, you can use the if conditionals in your workflow YAML file, or you can use the jobs.<job_id>.steps[step_id].if expression to control the execution of specific steps based on conditions.
+
+Here's a simple example of using an if condition to require a manual approval for deployment:
+
+```
+
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Other build and test steps go here
+
+      - name: Deploy to Production
+        run: |
+          # Deploy the application to production
+           if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.actor == 'approved_user'
+
+```
+
+
+In this example, the deployment step will only be executed if the push event is targeting the main branch and the actor (user) who triggered the event is the approved_user. This would require the approved user to manually trigger the workflow or have specific permissions to deploy to production.
+
+By using deployment protection rules, you can add safety measures to your CI/CD process, ensuring that deployments meet certain criteria before going live, and reducing the risk of accidental or undesired deployments.
+
+For more about Action Environments refer the following video : https://www.youtube.com/watch?v=5XfgT9A9PHw&ab_channel=MickeyGousset 
+
+### Runners
+
