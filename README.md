@@ -650,5 +650,75 @@ By using deployment protection rules, you can add safety measures to your CI/CD 
 
 For more about Action Environments refer the following video : https://www.youtube.com/watch?v=5XfgT9A9PHw&ab_channel=MickeyGousset 
 
-### Runners
+## Action Runners
 
+A GitHub Actions runner is a piece of software responsible for executing workflows in GitHub Actions. 
+
+It allows you to run your workflows on your own hardware or infrastructure, providing more control over the environment in which your workflows are executed.
+
+GitHub Actions runners can be either self-hosted or hosted by GitHub. Let's take a closer look at each type:
+
+1.**Self-hosted runner:**
+
+* A self-hosted runner is a runner that you set up and manage on your own infrastructure, such as your local machine, on-premises servers, or cloud virtual machines.
+
+* With self-hosted runners, you have more control over the environment, including the operating system, software, and dependencies installed on the runner.
+
+* Self-hosted runners are useful when you need to perform builds or tests in an environment that is not available on GitHub-hosted runners or when you require access to specific hardware resources or secure networks.
+
+2.**GitHub-hosted runner:**
+
+* GitHub-hosted runners are provided and maintained by GitHub.
+
+* GitHub offers different types of hosted runners that come pre-installed with various software and tools, such as Ubuntu, macOS, and Windows runners with different versions and configurations.
+
+* You can use GitHub-hosted runners for most common use cases since they provide a wide range of operating systems and software environments.
+
+* However, they have some limitations, such as the inability to access resources behind a firewall or specific software configurations not available on the hosted runners.
+
+You can configure your workflows to run on specific runners, either self-hosted or GitHub-hosted, using the runs-on keyword in your workflow YAML file.
+
+### Understanding Runners
+
+```
+
+name: My Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  my_job:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Your workflow steps go here
+
+
+```
+
+* In the example above, the workflow my_job is set to run on a GitHub-hosted runner with the latest version of Ubuntu. 
+
+* If you wanted to use a self-hosted runner, you would change the runs-on value to the label of your self-hosted runner, like runs-on: self-hosted.
+
+* Using GitHub Actions runners, you can automate your software development workflows, run tests, deploy applications, and more in a controlled and customizable environment.
+
+### Self-Hosted Runners
+
+* In GitHub Actions, a self-hosted runner is a type of runner that you can set up and manage on your own infrastructure. 
+
+* Unlike GitHub-hosted runners, which are provided and maintained by GitHub, self-hosted runners run on your own hardware, virtual machines, or cloud instances.
+
+* Self-hosted runners allow you to have more control over the environment in which your workflows run. 
+
+* You can customize the runner's operating system, installed software, dependencies, and configurations to match your specific project requirements. 
+
+* This makes self-hosted runners particularly useful for projects with specific toolchain or environment needs, or those that require access to resources behind a firewall or within a private network.
+
+One can see the reference video on how to create a self-hosted runners and connect that with Github Actions : https://www.youtube.com/watch?v=Rb2pUKdmdYo&t=16s&ab_channel=Abhishek.Veeramalla  
+
+* Setting up a self-hosted runner involves installing the GitHub Actions Runner application on your infrastructure and registering it with your GitHub repository. 
+
+* Once the runner is set up and connected to your repository, GitHub will use it to execute workflows when they are triggered.
